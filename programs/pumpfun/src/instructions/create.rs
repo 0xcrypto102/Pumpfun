@@ -1,50 +1,95 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{
-    associated_token::AssociatedToken,
-    token::{Mint,Token,TokenAccount,Transfer, transfer},
+use anchor_spl::token::{Mint,Token,TokenAccount, Transfer, transfer};
+use std::mem::size_of;
+use crate::{
+    constants::{GLOBAL_STATE_SEED, SOL_VAULT_SEED, BONDING_CURVE, VAULT_SEED},
+    state::{Global, BondingCurve},
+    error::*,
 };
-
-use crate::state::Global;
+use solana_program::{program::invoke, system_instruction};
 
 #[derive(Accounts)]
 pub struct Create<'info> {
     #[account(mut)]
-    pub mint: Signer<'info>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    pub mint_authority: AccountInfo<'info>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    #[account(mut)]
-    pub bonding_curve: AccountInfo<'info>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    #[account(mut)]
-    pub associated_bonding_curve: AccountInfo<'info>,
+    pub user: Signer<'info>,
+
+    pub mint: Account<'info, Mint>,
+
     #[account(
-        seeds = [b"global"],
+        init,
+        payer = user,
+        seeds = [BONDING_CURVE, mint.key().as_ref()],
+        bump,
+        space = 8 + size_of::<BondingCurve>()
+    )]
+    pub bonding_curve: Box<Account<'info, BondingCurve>>,
+
+    #[account(
+        mut,
+        seeds = [SOL_VAULT_SEED, mint.key().as_ref()],
         bump
     )]
-    pub global: Account<'info, Global>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    pub mpl_token_metadata: AccountInfo<'info>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
+    /// CHECK: this should be set by admin
+    pub vault: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        seeds = [VAULT_SEED, mint.key().as_ref()],
+        bump,
+        token::mint = mint,
+        token::authority = bonding_curve,
+    )]
+    pub associated_bonding_curve: Box<Account<'info, TokenAccount>>,
+
     #[account(mut)]
-    pub metadata:  AccountInfo<'info>,
-    #[account(mut)]
-    pub user: Signer<'info>,
+    pub associated_user_account: Account<'info, TokenAccount>,
+
+    #[account(
+        seeds = [GLOBAL_STATE_SEED],
+        bump
+    )]
+    pub global: Box<Account<'info, Global>>,
+   
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
-    pub rent: Sysvar<'info, Rent>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    #[account(
-        seeds = [b"__event_authority"],
-        bump
-    )]
-    pub event_authority: AccountInfo<'info>,
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    pub program: AccountInfo<'info>,
 }
 
-pub fn create(ctx: Context<Create>, name: String, symbol: String, uri: String) -> Result<()> {
-    // Implement create logic
+pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
+    let global: &Box<Account<Global>> = &ctx.accounts.global;
+    let bonding_curve: &mut Box<Account<BondingCurve>> = &mut ctx.accounts.bonding_curve;
+
+    require!(global.initialized == true, PumpFunCode::NotInitialized);
+
+    let cpi_ctx = CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        Transfer {
+            from: ctx.accounts.associated_user_account.to_account_info().clone(),
+            to: ctx.accounts.associated_bonding_curve.to_account_info().clone(),
+            authority: ctx.accounts.user.to_account_info().clone(),
+        },
+    );
+    transfer(cpi_ctx, amount)?;
+
+    
+    invoke(
+        &system_instruction::transfer(
+            &ctx.accounts.user.key(),
+            &ctx.accounts.vault.key(),
+            50000000
+        ),
+        &[
+            ctx.accounts.user.to_account_info().clone(),
+            ctx.accounts.vault.to_account_info().clone(),
+            ctx.accounts.system_program.to_account_info().clone(),
+        ],
+    )?;
+    // init the bonding curve
+    bonding_curve.virtual_token_reserves = global.initial_virtual_token_reserves;
+    bonding_curve.virtual_sol_reserves = global.initial_virtual_sol_reserves;
+    bonding_curve.real_token_reserves = amount;
+    bonding_curve.real_sol_reserves = 0;
+    bonding_curve.complete = false;
+
     Ok(())
 }

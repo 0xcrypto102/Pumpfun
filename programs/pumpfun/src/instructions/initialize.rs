@@ -1,6 +1,10 @@
 use anchor_lang::prelude::*;
 
-use crate::{state::Global};
+use crate::{
+    constants::GLOBAL_STATE_SEED,
+    state::Global,
+    error::*,
+};
 use std::mem::size_of;
 
 #[derive(Accounts)]
@@ -8,7 +12,7 @@ pub struct Initialize<'info> {
     #[account(
         init, 
         payer = owner, 
-        seeds = [b"global"],
+        seeds = [GLOBAL_STATE_SEED],
         bump,
         space = 8 + size_of::<Global>()
     )]
@@ -20,6 +24,10 @@ pub struct Initialize<'info> {
 
 pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
     let global = &mut ctx.accounts.global;
+
+    require!(global.initialized == false, PumpFunCode::AlreadyInitialized);
+    
+    global.authority = ctx.accounts.owner.key();
     global.initialized = true;
     
     Ok(())

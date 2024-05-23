@@ -9,7 +9,7 @@ pub use constants::*;
 use instructions::*;
 pub use state::*;
 
-declare_id!("AZ4NiGp84gJ4HN19ey9yJEvTR42gcUoZBgTpKhwSf7Sa");
+declare_id!("HkCqCjLaRX66DBnmamKxncBYwhhodHU3UjmYGp75J3Pp");
 
 #[program]
 pub mod pumpfun {
@@ -39,13 +39,8 @@ pub mod pumpfun {
         )
     }
 
-    pub fn create(ctx: Context<Create>, name: String, symbol: String, uri: String) -> Result<()> {
-        instructions::create(
-            ctx,
-            name, 
-            symbol, 
-            uri,
-        )
+    pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
+        instructions::create(ctx, amount)
     }
 
     pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {

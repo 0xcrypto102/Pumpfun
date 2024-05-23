@@ -25,4 +25,7 @@ pub enum PumpFunCode {
 
     #[msg("The program is not initialized.")]
     NotInitialized,
+    
+    #[msg("Math operation overflow.")]
+    MathOverflow
 }

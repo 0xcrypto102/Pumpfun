@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-pumpfun = "AZ4NiGp84gJ4HN19ey9yJEvTR42gcUoZBgTpKhwSf7Sa"
+pumpfun = "HkCqCjLaRX66DBnmamKxncBYwhhodHU3UjmYGp75J3Pp"
 
 [registry]
 url = "https://api.apr.dev"
