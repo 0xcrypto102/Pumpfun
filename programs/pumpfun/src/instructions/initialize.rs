@@ -25,7 +25,7 @@ pub struct Initialize<'info> {
 pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
     let global = &mut ctx.accounts.global;
 
-    require!(global.initialized == false, PumpFunCode::AlreadyInitialized);
+    require!(global.initialized == false, LeodayCode::AlreadyInitialized);
     
     global.authority = ctx.accounts.owner.key();
     global.initialized = true;

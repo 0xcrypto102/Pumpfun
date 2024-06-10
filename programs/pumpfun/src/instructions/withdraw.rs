@@ -56,7 +56,7 @@ pub struct Withdraw<'info> {
 pub fn withdraw(ctx: Context<Withdraw>) -> Result<()> {
     let accts = ctx.accounts;
 
-    require!(accts.bonding_curve.complete == true, PumpFunCode::BondingCurveNotComplete);
+    require!(accts.bonding_curve.complete == true, LeodayCode::BondingCurveNotComplete);
     // withdraw all SOL and rest tokens to the owner (temporary)
 
     let binding = accts.mint.key();

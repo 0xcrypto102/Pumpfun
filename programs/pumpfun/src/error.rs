@@ -1,9 +1,12 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum PumpFunCode {
+pub enum LeodayCode {
     #[msg("The given account is not authorized to execute this instruction.")]
     NotAuthorized,
+
+    #[msg("The given account is not valid fee recipient.")]
+    UnValidFeeRecipient,
 
     #[msg("The program is already initialized.")]
     AlreadyInitialized,

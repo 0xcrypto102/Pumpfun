@@ -2,11 +2,8 @@ use anchor_lang::prelude::*;
 
 #[event]
 pub struct CreateEvent {
-    pub name: String,
-    pub symbol: String,
-    pub uri: String,
     pub mint: Pubkey,
-    pub bondingCurve: Pubkey,
+    pub bonding_curve: Pubkey,
     pub user: Pubkey,
 }
 

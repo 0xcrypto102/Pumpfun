@@ -5,6 +5,7 @@ use crate::{
     constants::{GLOBAL_STATE_SEED, SOL_VAULT_SEED, BONDING_CURVE, VAULT_SEED},
     state::{Global, BondingCurve},
     error::*,
+    events::*,
 };
 use solana_program::{program::invoke, system_instruction};
 
@@ -59,7 +60,7 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     let global: &Box<Account<Global>> = &ctx.accounts.global;
     let bonding_curve: &mut Box<Account<BondingCurve>> = &mut ctx.accounts.bonding_curve;
 
-    require!(global.initialized == true, PumpFunCode::NotInitialized);
+    require!(global.initialized == true, LeodayCode::NotInitialized);
 
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
@@ -70,7 +71,6 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
         },
     );
     transfer(cpi_ctx, amount)?;
-
     
     invoke(
         &system_instruction::transfer(
@@ -90,6 +90,14 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.real_token_reserves = amount;
     bonding_curve.real_sol_reserves = 0;
     bonding_curve.complete = false;
+
+    emit!{
+        CreateEvent {
+            mint: ctx.accounts.mint.key(),
+            bonding_curve: bonding_curve.key(),
+            user: ctx.accounts.user.key()
+        }
+    }
 
     Ok(())
 }

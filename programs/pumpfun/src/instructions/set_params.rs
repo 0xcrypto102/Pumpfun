@@ -22,7 +22,7 @@ pub struct SetParams<'info> {
 pub fn set_params(ctx: Context<SetParams>, fee_recipient: Pubkey, initial_virtual_token_reserves: u64, initial_virtual_sol_reserves: u64, initial_real_token_reserves: u64, token_total_supply: u64, fee_basis_points: u64) -> Result<()> {
     let global = &mut ctx.accounts.global;
 
-    require!(global.authority == ctx.accounts.user.key(), PumpFunCode::NotAuthorized);
+    require!(global.authority == ctx.accounts.user.key(), LeodayCode::NotAuthorized);
 
     global.fee_recipient = fee_recipient;
     global.initial_virtual_token_reserves = initial_virtual_token_reserves;

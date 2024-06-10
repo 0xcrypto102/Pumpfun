@@ -5,6 +5,7 @@ use crate::{
     state::{Global, BondingCurve},
     constants::{GLOBAL_STATE_SEED, BONDING_CURVE, SOL_VAULT_SEED},
     error::*,
+    events::*,
 };
 use solana_program::{program::invoke_signed, system_instruction};
 
@@ -55,11 +56,12 @@ pub struct Sell<'info> {
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
-    pub rent: Sysvar<'info, Rent>,
+    pub clock: Sysvar<'info, Clock>,
 }
 
 pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> {
     let accts = ctx.accounts;
+    require!(accts.fee_recipient.key() == accts.global.fee_recipient, LeodayCode::UnValidFeeRecipient);
 
     let bonding_curve = &accts.bonding_curve;
 
@@ -67,7 +69,7 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     let sol_cost = calculate_sol_cost(bonding_curve, amount)?;
 
     // Ensure the SOL cost does not exceed max_sol_cost
-    require!(sol_cost >= min_sol_output, PumpFunCode::TooLittleSolReceived);
+    require!(sol_cost >= min_sol_output, LeodayCode::TooLittleSolReceived);
 
     // send sol from vault account to user (calculate fee)
     let binding = accts.mint.key();
@@ -114,17 +116,30 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     accts.bonding_curve.virtual_sol_reserves -= sol_cost - fee_amount;
     accts.bonding_curve.real_sol_reserves -= sol_cost - fee_amount;
 
+    emit!(
+        TradeEvent { 
+            mint: accts.mint.key(), 
+            sol_amount: sol_cost, 
+            token_amount: amount, 
+            is_buy: false, 
+            user: accts.user.key(), 
+            timestamp: accts.clock.unix_timestamp, 
+            virtual_sol_reserves: accts.bonding_curve.virtual_sol_reserves, 
+            virtual_token_reserves: accts.bonding_curve.virtual_token_reserves, 
+        }
+    );
+
     Ok(())
 }
 
 fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, token_amount: u64) -> Result<u64> {
-    let price_per_token  = (bonding_curve.virtual_token_reserves as u128).checked_add(token_amount as u128).ok_or(PumpFunCode::MathOverflow)?;
+    let price_per_token  = (bonding_curve.virtual_token_reserves as u128).checked_add(token_amount as u128).ok_or(LeodayCode::MathOverflow)?;
 
-    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128).checked_mul(bonding_curve.virtual_token_reserves as u128).ok_or(PumpFunCode::MathOverflow)?;
+    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128).checked_mul(bonding_curve.virtual_token_reserves as u128).ok_or(LeodayCode::MathOverflow)?;
 
-    let new_sol_reserve = total_liquidity.checked_div(price_per_token-1).ok_or(PumpFunCode::MathOverflow)?;
+    let new_sol_reserve = total_liquidity.checked_div(price_per_token-1).ok_or(LeodayCode::MathOverflow)?;
 
-    let sol_cost = (bonding_curve.virtual_sol_reserves as u128).checked_sub(new_sol_reserve).ok_or(PumpFunCode::MathOverflow)?;
+    let sol_cost = (bonding_curve.virtual_sol_reserves as u128).checked_sub(new_sol_reserve).ok_or(LeodayCode::MathOverflow)?;
 
     Ok(sol_cost as u64)
 }
