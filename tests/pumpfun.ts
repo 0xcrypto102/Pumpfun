@@ -2,15 +2,6 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Pumpfun } from "../target/types/pumpfun";
 import { TOKEN_PROGRAM_ID, createAccount,createInitializeMintInstruction, MINT_SIZE,getMinimumBalanceForRentExemptMint,createMint, createAssociatedTokenAccount, getAssociatedTokenAddress , ASSOCIATED_TOKEN_PROGRAM_ID, mintTo, mintToChecked, getAccount, getMint, getAssociatedTokenAddressSync, createAssociatedTokenAccountInstruction,createMintToCheckedInstruction } from "@solana/spl-token";
-// import {
-// 	findMasterEditionPda,
-// 	findMetadataPda,
-// 	mplTokenMetadata,
-// 	MPL_TOKEN_METADATA_PROGRAM_ID,
-// } from "@metaplex-foundation/mpl-token-metadata";
-// import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-// import { publicKey } from "@metaplex-foundation/umi";
-// import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
 
 import * as bs58 from "bs58";
 import { SystemProgram, Keypair, PublicKey, Transaction, SYSVAR_RENT_PUBKEY, SYSVAR_CLOCK_PUBKEY, Connection, clusterApiUrl,sendAndConfirmTransaction } from "@solana/web3.js";
@@ -23,11 +14,7 @@ describe("pumpfun", () => {
 
   const program = anchor.workspace.Pumpfun as Program<Pumpfun>;
   const feeRecipient = new PublicKey("DQruWfFthFDYSb1jmAwHXcqY75PVgV854XFhUXScMuLx");
-
-  // const owner = Keypair.fromSecretKey(
-  //   bs58.decode("3ocPfvJaobDAUUjaJW4w4Zdr4cGu3Sf9k63XwMyWt5gYUeUYBbuVKvFEr6e94s3h1U8SL1DXJjaj73LvrYsd59X5")
-  // );
-
+  
   const owner = Keypair.fromSecretKey(
     Uint8Array.from([113, 63, 93, 213, 68, 178, 22, 189, 136, 49, 33, 174, 196, 213, 238, 242, 164, 106, 9, 180, 15, 3, 238, 80, 159, 127, 118, 18, 231, 206, 240, 93, 21, 168, 99, 61, 85, 242, 222, 187, 12, 44, 91, 158, 122, 83, 103, 113, 125, 136, 28, 83, 108, 248, 78, 219, 197, 250, 38, 187, 70, 109, 130, 194])
   );

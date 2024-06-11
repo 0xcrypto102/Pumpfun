@@ -16,13 +16,13 @@ pub struct Buy<'info> {
         seeds = [GLOBAL_STATE_SEED],
         bump
     )]
-    pub global: Account<'info, Global>,
+    pub global: Box<Account<'info, Global>>,
     /// CHECK:` doc comment explaining why no checks through types are necessary.
     #[account(mut)]
     pub fee_recipient: AccountInfo<'info>, // wallet address to receive the fee as SOL 
 
     #[account(mut)]
-    pub mint: Account<'info, Mint>,  // the mint address of token
+    pub mint: Box<Account<'info, Mint>>,  // the mint address of token
 
     #[account(
         mut,
@@ -30,28 +30,28 @@ pub struct Buy<'info> {
         bump
     )]
     /// CHECK: this should be set by admin
-    pub vault: AccountInfo<'info>,
+    pub vault: UncheckedAccount <'info>,
 
     #[account(
         mut,
         seeds = [BONDING_CURVE, mint.key().as_ref()],
         bump
     )]
-    pub bonding_curve: Account<'info, BondingCurve>,
+    pub bonding_curve: Box<Account<'info, BondingCurve>>,
 
     #[account(
         mut,
         token::mint = mint,
         token::authority = bonding_curve,
     )]
-    pub associated_bonding_curve: Account<'info, TokenAccount>,
+    pub associated_bonding_curve: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         associated_token::mint = mint,
         associated_token::authority = user
     )]
-    pub associated_user: Account<'info, TokenAccount>,
+    pub associated_user: Box<Account<'info, TokenAccount>>,
     
     #[account(mut)]
     pub user: Signer<'info>,
@@ -133,6 +133,14 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     if accts.bonding_curve.real_sol_reserves > accts.global.initial_virtual_sol_reserves {
         accts.bonding_curve.complete = true;
 
+        msg!(
+            "Bonding Curve Complete : User: {}, Mint: {}, BondingCurve: {}, Timestamp: {}",
+            accts.user.key(),
+            accts.mint.key(),
+            accts.bonding_curve.key(),
+            accts.clock.unix_timestamp
+        );
+
         emit!(
             CompleteEvent { 
                 user: accts.user.key(), 
@@ -142,6 +150,19 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
             }
         );
     } 
+
+    msg!(
+        "Buy Trade : User: {}, Mint: {}, BondingCurve: {}, Timestamp: {}, SolCost: {}, Amount: {}, IsBuy: {}, VirtualSolReserves: {}, VirtualTokenReserves: {}",
+        accts.user.key(),
+        accts.mint.key(),
+        accts.bonding_curve.key(),
+        accts.clock.unix_timestamp,
+        sol_cost,
+        amount,
+        true,
+        accts.bonding_curve.virtual_sol_reserves,
+        accts.bonding_curve.virtual_token_reserves
+    );
 
     emit!(
         TradeEvent { 

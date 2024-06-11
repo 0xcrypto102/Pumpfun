@@ -12,11 +12,10 @@ pub struct SetParams<'info> {
         seeds = [GLOBAL_STATE_SEED],
         bump
     )]
-    pub global: Account<'info, Global>,
+    pub global: Box<Account<'info, Global>>,
 
     #[account(mut)]
     pub user: Signer<'info>,
-    pub system_program: Program<'info, System>,
 }
 
 pub fn set_params(ctx: Context<SetParams>, fee_recipient: Pubkey, initial_virtual_token_reserves: u64, initial_virtual_sol_reserves: u64, initial_real_token_reserves: u64, token_total_supply: u64, fee_basis_points: u64) -> Result<()> {

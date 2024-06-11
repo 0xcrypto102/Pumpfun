@@ -14,7 +14,7 @@ pub struct Create<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
-    pub mint: Account<'info, Mint>,
+    pub mint: Box<Account<'info, Mint>>,
 
     #[account(
         init,
@@ -31,7 +31,7 @@ pub struct Create<'info> {
         bump
     )]
     /// CHECK: this should be set by admin
-    pub vault: AccountInfo<'info>,
+    pub vault: UncheckedAccount <'info>,
 
     #[account(
         init_if_needed,
@@ -44,7 +44,7 @@ pub struct Create<'info> {
     pub associated_bonding_curve: Box<Account<'info, TokenAccount>>,
 
     #[account(mut)]
-    pub associated_user_account: Account<'info, TokenAccount>,
+    pub associated_user_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         seeds = [GLOBAL_STATE_SEED],
@@ -91,6 +91,15 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.real_sol_reserves = 0;
     bonding_curve.complete = false;
 
+
+    // Log the event details
+    msg!(
+        "CreateEvent - Mint: {}, BondingCurve: {}, User: {}",
+        ctx.accounts.mint.key(),
+        bonding_curve.key(),
+        ctx.accounts.user.key()
+    );
+    
     emit!{
         CreateEvent {
             mint: ctx.accounts.mint.key(),

@@ -16,7 +16,7 @@ pub struct Initialize<'info> {
         bump,
         space = 8 + size_of::<Global>()
     )]
-    pub global: Account<'info, Global>,
+    pub global: Box<Account<'info, Global>>,
     #[account(mut)]
     pub owner: Signer<'info>,
     pub system_program: Program<'info, System>,

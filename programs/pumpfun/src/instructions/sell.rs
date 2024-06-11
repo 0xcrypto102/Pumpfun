@@ -15,10 +15,10 @@ pub struct Sell<'info> {
         seeds = [GLOBAL_STATE_SEED],
         bump
     )]
-    pub global: Account<'info, Global>,
+    pub global: Box<Account<'info, Global>>,
     /// CHECK:` doc comment explaining why no checks through types are necessary.
     #[account(mut)]
-    pub fee_recipient: AccountInfo<'info>,
+    pub fee_recipient: UncheckedAccount<'info>,
 
     pub mint: Account<'info, Mint>,
 
@@ -28,7 +28,7 @@ pub struct Sell<'info> {
         bump
     )]
     /// CHECK: this should be set by admin
-    pub vault: AccountInfo<'info>,
+    pub vault: UncheckedAccount<'info>,
 
 
     #[account(
@@ -36,21 +36,21 @@ pub struct Sell<'info> {
         seeds = [BONDING_CURVE, mint.key().as_ref()],
         bump
     )]
-    pub bonding_curve: Account<'info, BondingCurve>,
+    pub bonding_curve: Box<Account<'info, BondingCurve>>,
 
     #[account(
         mut,
         token::mint = mint,
         token::authority = bonding_curve,
     )]
-    pub associated_bonding_curve: Account<'info, TokenAccount>,
+    pub associated_bonding_curve: Box<Account<'info, TokenAccount>>,
 
     #[account(
         mut,
         token::mint = mint,
         token::authority = user
     )]
-    pub associated_user: Account<'info, TokenAccount>,
+    pub associated_user: Box<Account<'info, TokenAccount>>,
     
     #[account(mut)]
     pub user: Signer<'info>,
@@ -115,6 +115,19 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     accts.bonding_curve.virtual_token_reserves += amount;
     accts.bonding_curve.virtual_sol_reserves -= sol_cost - fee_amount;
     accts.bonding_curve.real_sol_reserves -= sol_cost - fee_amount;
+
+    // Log the TradeEvent details
+    msg!(
+        "TradeEvent - Mint: {}, SolAmount: {}, TokenAmount: {}, IsBuy: {}, User: {}, Timestamp: {}, VirtualSolReserves: {}, VirtualTokenReserves: {}",
+        accts.mint.key(),
+        sol_cost,
+        amount,
+        false,
+        accts.user.key(),
+        accts.clock.unix_timestamp,
+        accts.bonding_curve.virtual_sol_reserves,
+        accts.bonding_curve.virtual_token_reserves,
+    );
 
     emit!(
         TradeEvent { 
