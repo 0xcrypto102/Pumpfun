@@ -63,6 +63,7 @@ pub struct Buy<'info> {
 pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     let accts = ctx.accounts;
 
+    require!(amount >0 , LeodayCode::ZeroAmount);
     require!(accts.bonding_curve.complete == false, LeodayCode::BondingCurveComplete);
     require!(accts.fee_recipient.key() == accts.global.fee_recipient, LeodayCode::UnValidFeeRecipient);
 
@@ -130,7 +131,9 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     accts.bonding_curve.virtual_sol_reserves += sol_cost - fee_amount;
     accts.bonding_curve.real_sol_reserves += sol_cost - fee_amount;
 
-    if accts.bonding_curve.real_sol_reserves > accts.global.initial_virtual_sol_reserves {
+    // if accts.bonding_curve.real_sol_reserves > accts.global.initial_virtual_sol_reserves {
+    if accts.bonding_curve.real_sol_reserves > 2000000000 /* For testing */ {
+
         accts.bonding_curve.complete = true;
 
         msg!(

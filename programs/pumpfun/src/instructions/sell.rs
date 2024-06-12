@@ -62,6 +62,7 @@ pub struct Sell<'info> {
 pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> {
     let accts = ctx.accounts;
     require!(accts.fee_recipient.key() == accts.global.fee_recipient, LeodayCode::UnValidFeeRecipient);
+    require!(amount >0 , LeodayCode::ZeroAmount);
 
     let bonding_curve = &accts.bonding_curve;
 

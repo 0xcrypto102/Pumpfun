@@ -5,6 +5,7 @@ pub struct Global {
     pub initialized: bool,
     pub authority: Pubkey,
     pub fee_recipient: Pubkey,
+    pub owner_wallet: Pubkey,
     pub initial_virtual_token_reserves: u64,
     pub initial_virtual_sol_reserves: u64,
     pub initial_real_token_reserves: u64,

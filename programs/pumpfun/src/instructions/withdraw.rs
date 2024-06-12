@@ -42,12 +42,12 @@ pub struct Withdraw<'info> {
     #[account(
         mut,
         token::mint = mint,
-        token::authority = user
+        token::authority = owner_wallet
     )]
     pub associated_user: Account<'info, TokenAccount>,
     
     #[account(mut)]
-    pub user: Signer<'info>,
+    pub owner_wallet: Signer<'info>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub rent: Sysvar<'info, Rent>,
@@ -57,6 +57,7 @@ pub fn withdraw(ctx: Context<Withdraw>) -> Result<()> {
     let accts = ctx.accounts;
 
     require!(accts.bonding_curve.complete == true, LeodayCode::BondingCurveNotComplete);
+    require!(accts.global.owner_wallet == accts.owner_wallet.key(), LeodayCode::NotAuthorized);
     // withdraw all SOL and rest tokens to the owner (temporary)
 
     let binding = accts.mint.key();
@@ -67,14 +68,18 @@ pub fn withdraw(ctx: Context<Withdraw>) -> Result<()> {
 
     
     invoke_signed(
-        &system_instruction::transfer(&accts.vault.key(), &accts.user.key(), accts.bonding_curve.real_sol_reserves),
+        &system_instruction::transfer(&accts.vault.key(), &accts.owner_wallet.key(), accts.bonding_curve.real_sol_reserves),
         &[
             accts.vault.to_account_info().clone(),
-            accts.user.to_account_info().clone(),
+            accts.owner_wallet.to_account_info().clone(),
             accts.system_program.to_account_info().clone(),
         ],
         signer,
     )?;
+
+    let (_, bump) = Pubkey::find_program_address(&[BONDING_CURVE, binding.as_ref()], ctx.program_id);
+    let vault_seeds = &[BONDING_CURVE, binding.as_ref(), &[bump]];
+    let signer = &[&vault_seeds[..]];
 
     let cpi_ctx = CpiContext::new(
         accts.token_program.to_account_info(),

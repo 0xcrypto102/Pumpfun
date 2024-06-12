@@ -11,7 +11,7 @@ use instructions::*;
 pub use state::*;
 pub use events::*;
 
-declare_id!("fkS7VXcRWEAShZHZK31oQnTYmnioe7GHwRAb19RkZbu");
+declare_id!("EawhwCPCXGopADw5nvCP6BeoqPxCBMnrRzQ5p892Ucih");
 
 #[program]
 pub mod pumpfun {
@@ -24,6 +24,7 @@ pub mod pumpfun {
     pub fn set_params(
         ctx: Context<SetParams>,
         fee_recipient: Pubkey,
+        owner_wallet: Pubkey,
         initial_virtual_token_reserves: u64,
         initial_virtual_sol_reserves: u64,
         initial_real_token_reserves: u64,
@@ -33,6 +34,7 @@ pub mod pumpfun {
         instructions::set_params(
             ctx,
             fee_recipient,
+            owner_wallet,
             initial_virtual_token_reserves,
             initial_virtual_sol_reserves,
             initial_real_token_reserves,

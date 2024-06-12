@@ -30,5 +30,8 @@ pub enum LeodayCode {
     NotInitialized,
     
     #[msg("Math operation overflow.")]
-    MathOverflow
+    MathOverflow,
+
+    #[msg("Amount should be bigger than 0.")]
+    ZeroAmount
 }
