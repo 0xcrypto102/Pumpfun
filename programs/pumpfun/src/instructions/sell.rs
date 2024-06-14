@@ -119,7 +119,7 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
 
     // Log the TradeEvent details
     msg!(
-        "TradeEvent - Mint: {}, SolAmount: {}, TokenAmount: {}, IsBuy: {}, User: {}, Timestamp: {}, VirtualSolReserves: {}, VirtualTokenReserves: {}",
+        "Trade: Type: Sell, Mint: {}, SolAmount: {}, TokenAmount: {}, IsBuy: {}, User: {}, Timestamp: {}, VirtualSolReserves: {}, VirtualTokenReserves: {}",
         accts.mint.key(),
         sol_cost,
         amount,
