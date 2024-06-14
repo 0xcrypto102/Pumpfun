@@ -65,6 +65,7 @@ describe("pumpfun", () => {
     const tokenTotalSupply = 1000000000000000;
     const feeBasisPoints = 50;
     const ownerWallet = new PublicKey("8K9HHECZuyaNL3uyYmNA3NanNoZSxM5EGy7E7QpYoywL");
+    const createFee = 1000000000; // 1sol (1sol = 10 ** 9 lamports)
 
     const tx = await program.rpc.setParams(
       feeRecipient,
@@ -73,7 +74,9 @@ describe("pumpfun", () => {
       new anchor.BN(initialVirtualSolReserves),
       new anchor.BN(initialRealTokenReserves),
       new anchor.BN(tokenTotalSupply),
-      new anchor.BN(feeBasisPoints),{
+      new anchor.BN(feeBasisPoints),
+      new anchor.BN(createFee),
+      {
         accounts: {
           global,
           user: owner.publicKey,
