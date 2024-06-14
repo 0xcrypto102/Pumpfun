@@ -11,7 +11,7 @@ use instructions::*;
 pub use state::*;
 pub use events::*;
 
-declare_id!("EawhwCPCXGopADw5nvCP6BeoqPxCBMnrRzQ5p892Ucih");
+declare_id!("8TmSyC9qHq1uuS8GGLbUpr9BgeMtT6jzQ9p9eEu5YVcV");
 
 #[program]
 pub mod pumpfun {
@@ -30,6 +30,7 @@ pub mod pumpfun {
         initial_real_token_reserves: u64,
         token_total_supply: u64,
         fee_basis_points: u64,
+        create_fee: u64,
     ) -> Result<()> {
         instructions::set_params(
             ctx,
@@ -40,6 +41,7 @@ pub mod pumpfun {
             initial_real_token_reserves,
             token_total_supply,
             fee_basis_points,
+            create_fee,
         )
     }
 

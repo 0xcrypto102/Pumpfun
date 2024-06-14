@@ -76,7 +76,7 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
         &system_instruction::transfer(
             &ctx.accounts.user.key(),
             &ctx.accounts.vault.key(),
-            50000000
+            global.create_fee
         ),
         &[
             ctx.accounts.user.to_account_info().clone(),

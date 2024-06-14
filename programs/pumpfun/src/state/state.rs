@@ -11,6 +11,7 @@ pub struct Global {
     pub initial_real_token_reserves: u64,
     pub token_total_supply: u64,
     pub fee_basis_points: u64,
+    pub create_fee: u64,
 }
 
 #[account]

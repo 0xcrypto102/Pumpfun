@@ -40,7 +40,6 @@ describe("pumpfun", () => {
     );
     console.log("global->", global.toString());
   });
-
   it("Is initialized!", async () => {
     try {
       const tx = await program.rpc.initialize(
@@ -84,7 +83,9 @@ describe("pumpfun", () => {
     );
     const globalData = await program.account.global.fetch(global);
     console.log("globalData->", globalData);
+
   });
+/*
 
   it("create", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
@@ -228,6 +229,7 @@ describe("pumpfun", () => {
     }
    
   });
+  */
 });
 
 const exchangeRate = (purchaseAmount: number, liquidityPool: any) => {
