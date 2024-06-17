@@ -1,0 +1,27 @@
+[toolchain]
+
+[features]
+seeds = false
+skip-lint = false
+
+[programs.devnet]
+apelol = "5QXnJabQhP9M4Pi8QAh6MZrGenT9SFpwDaiVFvfYvVv3"
+
+[programs.mainnet]
+apelol = "5QXnJabQhP9M4Pi8QAh6MZrGenT9SFpwDaiVFvfYvVv3"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+# cluster = "https://convincing-clean-pallet.solana-mainnet.quiknode.pro/783f9fd9a8ebeb75cdd9b489fd7485a601974b42/"
+# cluster = "devnet"
+cluster = "https://mainnet.helius-rpc.com/?api-key=e2ddfac5-ccdd-4996-974d-af84e401132c"
+
+# wallet = "/root/.config/solana/cupid.json"
+# wallet = "/root/.config/solana/id.json"
+
+wallet = "./keypair.json"
+
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
