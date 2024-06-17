@@ -11,7 +11,7 @@ use instructions::*;
 pub use state::*;
 pub use events::*;
 
-declare_id!("13uXqiDQ7Me2x79RwS8XgDDySwyjf7ZgUSp8gScYK4zp");
+declare_id!("5A3qSiYbqAZe3pTCNZBhmihRwxSLTaUE9vifLU5GAqRq");
 
 #[program]
 pub mod apelol {

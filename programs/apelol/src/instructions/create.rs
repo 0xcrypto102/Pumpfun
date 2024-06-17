@@ -89,8 +89,9 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.virtual_sol_reserves = global.initial_virtual_sol_reserves;
     bonding_curve.real_token_reserves = amount;
     bonding_curve.real_sol_reserves = 0;
+    bonding_curve.token_total_supply = global.token_total_supply;
     bonding_curve.complete = false;
-
+    bonding_curve.token_mint = ctx.accounts.mint.key();
 
     // Log the event details
     msg!(
