@@ -100,6 +100,7 @@ describe("Apelol", () => {
     const initialRealTokenReserves = "793100000000000000";
     const tokenTotalSupply = "1000000000000000000";
     const feeBasisPoints = 100;
+    const mcap = "300000000000"
     const ownerWallet = new PublicKey(
       "Bmed1qoe6u8VxmJ5p6SW77fb7LiSqWmQdTtKTz5dyh62"
     );
@@ -113,6 +114,7 @@ describe("Apelol", () => {
         new anchor.BN(initialVirtualSolReserves),
         new anchor.BN(initialRealTokenReserves),
         new anchor.BN(tokenTotalSupply),
+        new anchor.BN(mcap),
         new anchor.BN(feeBasisPoints),
         new anchor.BN(createFee),
         {

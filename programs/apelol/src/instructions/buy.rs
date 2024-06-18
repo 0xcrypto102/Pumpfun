@@ -131,8 +131,9 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     accts.bonding_curve.virtual_sol_reserves += sol_cost - fee_amount;
     accts.bonding_curve.real_sol_reserves += sol_cost - fee_amount;
 
-    if accts.bonding_curve.real_sol_reserves > accts.global.initial_virtual_sol_reserves {
-    // if accts.bonding_curve.real_sol_reserves > 2000000000 /* For testing */ {
+    let macp = ((accts.bonding_curve.real_sol_reserves as u128) * (accts.bonding_curve.token_total_supply as u128) / (accts.bonding_curve.real_token_reserves as u128)) as u64;
+
+    if macp > accts.bonding_curve.mcap_limit {
 
         accts.bonding_curve.complete = true;
 
