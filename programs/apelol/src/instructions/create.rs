@@ -90,6 +90,7 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.real_token_reserves = amount;
     bonding_curve.real_sol_reserves = 0;
     bonding_curve.token_total_supply = global.token_total_supply;
+    bonding_curve.mcap_limit = global.mcap_limit;
     bonding_curve.complete = false;
     bonding_curve.token_mint = ctx.accounts.mint.key();
 

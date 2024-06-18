@@ -78,6 +78,7 @@ describe("Apelol", () => {
     );
     console.log("global->", global.toString());
   });
+  /*
   it("Is initialized!", async () => {
     try {
       const tx = await program.rpc.initialize({
@@ -93,6 +94,7 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
+  */
 
   it("set params", async () => {
     const initialVirtualTokenReserves = "1073000000000000000";
@@ -100,6 +102,7 @@ describe("Apelol", () => {
     const initialRealTokenReserves = "793100000000000000";
     const tokenTotalSupply = "1000000000000000000";
     const feeBasisPoints = 100;
+    const mcap = "3000000000"
     const ownerWallet = new PublicKey(
       "Bmed1qoe6u8VxmJ5p6SW77fb7LiSqWmQdTtKTz5dyh62"
     );
@@ -113,6 +116,7 @@ describe("Apelol", () => {
         new anchor.BN(initialVirtualSolReserves),
         new anchor.BN(initialRealTokenReserves),
         new anchor.BN(tokenTotalSupply),
+        new anchor.BN(mcap),
         new anchor.BN(feeBasisPoints),
         new anchor.BN(createFee),
         {

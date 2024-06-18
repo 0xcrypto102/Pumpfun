@@ -29,6 +29,7 @@ pub mod apelol {
         initial_virtual_sol_reserves: u64,
         initial_real_token_reserves: u64,
         token_total_supply: u64,
+        mcap_limit: u64,
         fee_basis_points: u64,
         create_fee: u64,
     ) -> Result<()> {
@@ -40,6 +41,7 @@ pub mod apelol {
             initial_virtual_sol_reserves,
             initial_real_token_reserves,
             token_total_supply,
+            mcap_limit,
             fee_basis_points,
             create_fee,
         )
