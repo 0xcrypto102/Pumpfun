@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint,Token,TokenAccount, Transfer, transfer};
 use std::mem::size_of;
 use crate::{
-    constants::{GLOBAL_STATE_SEED, BONDING_CURVE, VAULT_SEED},
+    constants::{GLOBAL_STATE_SEED, SOL_VAULT_SEED, BONDING_CURVE, VAULT_SEED},
     state::{Global, BondingCurve},
     error::*,
     events::*,
@@ -16,10 +16,6 @@ pub struct Create<'info> {
 
     pub mint: Box<Account<'info, Mint>>,
 
-    /// CHECK:` doc comment explaining why no checks through types are necessary.
-    #[account(mut)]
-    pub fee_recipient: AccountInfo<'info>, // wallet address to receive the fee as SOL 
-
     #[account(
         init,
         payer = user,
@@ -28,6 +24,14 @@ pub struct Create<'info> {
         space = 8 + size_of::<BondingCurve>()
     )]
     pub bonding_curve: Box<Account<'info, BondingCurve>>,
+
+    #[account(
+        mut,
+        seeds = [SOL_VAULT_SEED, mint.key().as_ref()],
+        bump
+    )]
+    /// CHECK: this should be set by admin
+    pub vault: UncheckedAccount <'info>,
 
     #[account(
         init_if_needed,
@@ -57,7 +61,6 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     let bonding_curve: &mut Box<Account<BondingCurve>> = &mut ctx.accounts.bonding_curve;
 
     require!(global.initialized == true, ApeLolCode::NotInitialized);
-    require!(ctx.accounts.fee_recipient.key() == ctx.accounts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
 
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
@@ -72,12 +75,12 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     invoke(
         &system_instruction::transfer(
             &ctx.accounts.user.key(),
-            &ctx.accounts.fee_recipient.key(),
+            &ctx.accounts.vault.key(),
             global.create_fee
         ),
         &[
             ctx.accounts.user.to_account_info().clone(),
-            ctx.accounts.fee_recipient.to_account_info().clone(),
+            ctx.accounts.vault.to_account_info().clone(),
             ctx.accounts.system_program.to_account_info().clone(),
         ],
     )?;

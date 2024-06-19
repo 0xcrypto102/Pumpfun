@@ -14,6 +14,9 @@ pub enum ApeLolCode {
     #[msg("slippage: Too much SOL required to buy the given amount of tokens.")]
     TooMuchSolRequired,
 
+    #[msg("slippage: Too little Token received to sell the given amount of SOL.")]
+    TooLittleTokenReceived,
+
     #[msg("slippage: Too little SOL received to sell the given amount of tokens.")]
     TooLittleSolReceived,
 
