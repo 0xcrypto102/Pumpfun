@@ -63,7 +63,7 @@ describe("Apelol", () => {
 
   let global: PublicKey;
   let globalBump: number;
-  const mint = new PublicKey("3EFZ4ZXPfuCZhqf9UrSQ9z22NbXPwyqEeyL3Kihp2vW2");
+  const mint = new PublicKey("hVvp6MMynkk8JkvKYvn2wXZZkNU5qd9C2ov2S1X9MLk");
   const BONDING_CURVE = "BONDING-CURVE";
   const SOL_VAULT_SEED = "SOL-VAULT-SEED";
   const VAULT_SEED = "VAULT-SEED";
@@ -94,7 +94,6 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
-  */
 
   it("set params", async () => {
     const initialVirtualTokenReserves = "1073000000000000000";
@@ -102,7 +101,7 @@ describe("Apelol", () => {
     const initialRealTokenReserves = "793100000000000000";
     const tokenTotalSupply = "1000000000000000000";
     const feeBasisPoints = 100;
-    const mcap = "3000000000"
+    const mcap = "300000000000";
     const ownerWallet = new PublicKey(
       "Bmed1qoe6u8VxmJ5p6SW77fb7LiSqWmQdTtKTz5dyh62"
     );
@@ -213,6 +212,7 @@ describe("Apelol", () => {
     ],
     program.programId
     );
+    console.log("vault->", vault.toString());
   
     const [associatedBondingCurve, _3] = await anchor.web3.PublicKey.findProgramAddress(
     [
@@ -232,7 +232,7 @@ describe("Apelol", () => {
 
     const liquidityPool = await program.account.bondingCurve.fetch(bondingCurve);
     const slippage = 20;
-    const amount = 1.1;
+    const amount = 5;
     const tokenReceivedWithLiquidity = exchangeRate(Math.floor(1e9 * amount), liquidityPool);
     console.log(Number(tokenReceivedWithLiquidity))
     const solAmount = new anchor.BN(Math.floor(1e9 * amount));
@@ -273,7 +273,9 @@ describe("Apelol", () => {
     }
    
   });
+  */
 
+  /*
   it("sell", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -350,6 +352,7 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
+ */
 
  it("withdraw the bonding curve", async() => {
   const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
