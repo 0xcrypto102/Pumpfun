@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-apelol = "5A3qSiYbqAZe3pTCNZBhmihRwxSLTaUE9vifLU5GAqRq"
+apelol = "7yMaUoFPphgHcur9GxFQcTnefyxCDncwe5dMQG9xp7W7"
 
 [programs.mainnet]
 apelol = "5QXnJabQhP9M4Pi8QAh6MZrGenT9SFpwDaiVFvfYvVv3"

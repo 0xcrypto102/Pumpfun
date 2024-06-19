@@ -134,7 +134,6 @@ describe("Apelol", () => {
   
   });
   */
-
   /*
   it("create", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
@@ -200,7 +199,6 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
-  */
   it("buy", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -279,7 +277,6 @@ describe("Apelol", () => {
    
   });
 
-  /*
   it("sell", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
