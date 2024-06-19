@@ -133,7 +133,9 @@ describe("Apelol", () => {
     }
   
   });
+  */
 
+  /*
   it("create", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -163,6 +165,8 @@ describe("Apelol", () => {
       mint,
       user.publicKey
     );
+    const globalStateData: any = await program.account.global.fetch(global);
+    const feeRecipient: PublicKey = globalStateData.feeRecipient;
 
     try {
       let depositAmount = "990000000000000000";
@@ -178,7 +182,7 @@ describe("Apelol", () => {
               user: user.publicKey,
               mint: mint,
               bondingCurve,
-              vault,
+              feeRecipient,
               associatedBondingCurve,
               associatedUserAccount,
               global,
@@ -196,6 +200,7 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
+  */
   it("buy", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -273,7 +278,6 @@ describe("Apelol", () => {
     }
    
   });
-  */
 
   /*
   it("sell", async() => {
@@ -353,7 +357,7 @@ describe("Apelol", () => {
     }
   });
  */
-
+  /*
  it("withdraw the bonding curve", async() => {
   const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
     [
@@ -410,6 +414,7 @@ describe("Apelol", () => {
 
 
  });
+ */
 });
 
 const exchangeRate = (purchaseAmount: number, liquidityPool: any) => {

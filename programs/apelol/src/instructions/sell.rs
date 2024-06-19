@@ -68,7 +68,10 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     let bonding_curve = &accts.bonding_curve;
 
     // Calculate the required SOL cost for the given token amount
-    let sol_cost = calculate_sol_cost(bonding_curve, amount)?;
+    let mut sol_cost = calculate_sol_cost(bonding_curve, amount)?;
+    if accts.bonding_curve.real_sol_reserves < sol_cost {
+        sol_cost = accts.bonding_curve.real_sol_reserves;
+    }
 
     // Ensure the SOL cost does not exceed max_sol_cost
     require!(sol_cost >= min_sol_output, ApeLolCode::TooLittleSolReceived);
@@ -115,8 +118,8 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     //  update the bonding curve
     accts.bonding_curve.real_token_reserves += amount;
     accts.bonding_curve.virtual_token_reserves += amount;
-    accts.bonding_curve.virtual_sol_reserves -= sol_cost - fee_amount;
-    accts.bonding_curve.real_sol_reserves -= sol_cost - fee_amount;
+    accts.bonding_curve.virtual_sol_reserves = accts.bonding_curve.virtual_sol_reserves.saturating_sub(sol_cost);
+    accts.bonding_curve.real_sol_reserves = accts.bonding_curve.real_sol_reserves.saturating_sub(sol_cost);
 
     // Log the TradeEvent details
 
