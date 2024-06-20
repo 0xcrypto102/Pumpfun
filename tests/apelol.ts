@@ -78,7 +78,6 @@ describe("Apelol", () => {
     );
     console.log("global->", global.toString());
   });
-  /*
   it("Is initialized!", async () => {
     try {
       const tx = await program.rpc.initialize({
@@ -133,9 +132,7 @@ describe("Apelol", () => {
     }
   
   });
-  */
 
-  /*
   it("create", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -200,7 +197,7 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
-  */
+  /*
   it("buy", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -279,7 +276,6 @@ describe("Apelol", () => {
    
   });
 
-  /*
   it("sell", async() => {
     const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
       [
@@ -356,8 +352,6 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
- */
-  /*
  it("withdraw the bonding curve", async() => {
   const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
     [

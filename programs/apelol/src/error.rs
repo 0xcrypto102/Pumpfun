@@ -33,5 +33,8 @@ pub enum ApeLolCode {
     MathOverflow,
 
     #[msg("Amount should be bigger than 0.")]
-    ZeroAmount
+    ZeroAmount,
+
+    #[msg("Amount is invalid to create the pool.")]
+    InvalidAmount
 }
