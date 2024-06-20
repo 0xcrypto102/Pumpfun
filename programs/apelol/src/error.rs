@@ -36,5 +36,8 @@ pub enum ApeLolCode {
     ZeroAmount,
 
     #[msg("Amount is invalid to create the pool.")]
-    InvalidAmount
+    InvalidAmount,
+
+    #[msg("Supply is invalid to create the pool.")]
+    InvalidSupply
 }

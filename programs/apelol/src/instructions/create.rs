@@ -60,6 +60,7 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     require!(global.initialized == true, ApeLolCode::NotInitialized);
     require!(ctx.accounts.fee_recipient.key() == ctx.accounts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
     require!(mint.supply / 100 * 99 == amount, ApeLolCode::InvalidAmount);
+    require!(mint.supply == 1000000000000000000, ApeLolCode::InvalidSupply);
 
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
