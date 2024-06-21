@@ -3,7 +3,7 @@ use anchor_spl::token::{Mint,Token,TokenAccount,Transfer, transfer};
 
 use crate::{
     state::{Global, BondingCurve},
-    constants::{GLOBAL_STATE_SEED, BONDING_CURVE, SOL_VAULT_SEED},
+    constants::{GLOBAL_STATE_SEED, INITIAL_TOKEN_PRICE, PRICE_INCREASE_RATE, BONDING_CURVE, SOL_VAULT_SEED, UNITS_PER_TOKEN},
     error::*,
     events::*,
 };
@@ -68,12 +68,12 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     let bonding_curve = &accts.bonding_curve;
 
     // Calculate the required SOL cost for the given token amount
-    let mut sol_cost = calculate_sol_cost(bonding_curve, amount)?;
+    let mut sol_cost = calculate_sol_amount_to_get(bonding_curve, (amount as f64) / UNITS_PER_TOKEN)?;
     if accts.bonding_curve.real_sol_reserves < sol_cost {
         sol_cost = accts.bonding_curve.real_sol_reserves;
     }
 
-    // Ensure the SOL cost does not exceed max_sol_cost
+    // Ensure the SOL cost exceeds min_sol_output
     require!(sol_cost >= min_sol_output, ApeLolCode::TooLittleSolReceived);
 
     // send sol from vault account to user (calculate fee)
@@ -152,8 +152,12 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     Ok(())
 }
 
-fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, token_amount: u64) -> Result<u64> {
-    let sol_cost = ((token_amount as u128).checked_mul(bonding_curve.virtual_sol_reserves as u128).ok_or(ApeLolCode::MathOverflow)?.checked_div(bonding_curve.virtual_token_reserves as u128).ok_or(ApeLolCode::MathOverflow)?) as u64;
+// Get sol amount according to token amount when selling
+fn calculate_sol_amount_to_get(bonding_curve: &Account<BondingCurve>, token_amount_to_sell: f64) -> Result<u64> {
+    let current_tokens_issued = (((bonding_curve.token_total_supply as u128) * 9900 / 10000) as f64 - bonding_curve.real_token_reserves as f64) / UNITS_PER_TOKEN;
+    let a: f64 = INITIAL_TOKEN_PRICE;
+    let b: f64 = PRICE_INCREASE_RATE;
+    let sol_amount = a * ((b * token_amount_to_sell).exp() - 1.0) * (b * current_tokens_issued - b * token_amount_to_sell).exp() / b;
 
-    Ok(sol_cost as u64)
+    Ok((sol_amount * UNITS_PER_TOKEN) as u64)
 }
