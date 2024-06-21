@@ -190,87 +190,87 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
-  // it("buy", async () => {
-  //   const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
-  //     [Buffer.from(BONDING_CURVE), mint.toBuffer()],
-  //     program.programId
-  //   );
+  it("buy", async () => {
+    const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from(BONDING_CURVE), mint.toBuffer()],
+      program.programId
+    );
 
-  //   const [vault, _2] = await anchor.web3.PublicKey.findProgramAddress(
-  //     [Buffer.from(SOL_VAULT_SEED), mint.toBuffer()],
-  //     program.programId
-  //   );
-  //   console.log("vault->", vault.toString());
+    const [vault, _2] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from(SOL_VAULT_SEED), mint.toBuffer()],
+      program.programId
+    );
+    console.log("vault->", vault.toString());
 
-  //   const [associatedBondingCurve, _3] =
-  //     await anchor.web3.PublicKey.findProgramAddress(
-  //       [Buffer.from(VAULT_SEED), mint.toBuffer()],
-  //       program.programId
-  //     );
+    const [associatedBondingCurve, _3] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [Buffer.from(VAULT_SEED), mint.toBuffer()],
+        program.programId
+      );
 
-  //   //   const [vault, _2] = await anchor.web3.PublicKey.findProgramAddress(
-  //   //     [Buffer.from(SOL_VAULT_SEED), mint.toBuffer()],
-  //   //     program.programId
-  //   //   );
+    //   const [vault, _2] = await anchor.web3.PublicKey.findProgramAddress(
+    //     [Buffer.from(SOL_VAULT_SEED), mint.toBuffer()],
+    //     program.programId
+    //   );
 
-  //   //   const [associatedBondingCurve, _3] =
-  //   //     await anchor.web3.PublicKey.findProgramAddress(
-  //   //       [Buffer.from(VAULT_SEED), mint.toBuffer()],
-  //   //       program.programId
-  //   //     );
+    //   const [associatedBondingCurve, _3] =
+    //     await anchor.web3.PublicKey.findProgramAddress(
+    //       [Buffer.from(VAULT_SEED), mint.toBuffer()],
+    //       program.programId
+    //     );
 
-  //   const liquidityPool = await program.account.bondingCurve.fetch(
-  //     bondingCurve
-  //   );
-  //   const slippage = 20;
-  //   const amount = 5;
-  //   const tokenReceivedWithLiquidity = exchangeRate(
-  //     Math.floor(1e9 * amount),
-  //     liquidityPool
-  //   );
-  //   console.log(Number(tokenReceivedWithLiquidity));
-  //   const solAmount = new anchor.BN(Math.floor(1e9 * amount));
-  //   const maxSolAmount = solAmount
-  //     .mul(new anchor.BN(100 + slippage))
-  //     .div(new anchor.BN(100));
-  //   console.log(
-  //     Number(tokenReceivedWithLiquidity),
-  //     Number(liquidityPool.realTokenReserves)
-  //   );
-  //   try {
-  //     let listenerId: number;
-  //     // const event = await new Promise<Event[E]>(async (res) => {
-  //     //   listenerId = program.addEventListener("TradeEvent", (event) => {
-  //     //     res(event);
-  //     //   });
-  //     const buy_tx = await program.rpc.buy(
-  //       tokenReceivedWithLiquidity,
-  //       maxSolAmount,
-  //       {
-  //         accounts: {
-  //           global,
-  //           feeRecipient,
-  //           mint,
-  //           vault,
-  //           bondingCurve,
-  //           associatedBondingCurve,
-  //           associatedUser: associatedUserAccount,
-  //           user: buyer.publicKey,
-  //           systemProgram: SystemProgram.programId,
-  //           tokenProgram: TOKEN_PROGRAM_ID,
-  //           clock: SYSVAR_CLOCK_PUBKEY
-  //         },
-  //         signers: [buyer]
-  //       }
-  //     );
-  //     console.log(buy_tx);
-  //     // });
-  //     // await program.removeEventListener(listenerId);
-  //     // console.log(event);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
+    const liquidityPool = await program.account.bondingCurve.fetch(
+      bondingCurve
+    );
+    const slippage = 20;
+    const amount = 5;
+    const tokenReceivedWithLiquidity = exchangeRate(
+      Math.floor(1e9 * amount),
+      liquidityPool
+    );
+    console.log(Number(tokenReceivedWithLiquidity));
+    const solAmount = new anchor.BN(Math.floor(1e9 * amount));
+    const maxSolAmount = solAmount
+      .mul(new anchor.BN(100 + slippage))
+      .div(new anchor.BN(100));
+    console.log(
+      Number(tokenReceivedWithLiquidity),
+      Number(liquidityPool.realTokenReserves)
+    );
+    try {
+      let listenerId: number;
+      // const event = await new Promise<Event[E]>(async (res) => {
+      //   listenerId = program.addEventListener("TradeEvent", (event) => {
+      //     res(event);
+      //   });
+      const buy_tx = await program.rpc.buy(
+        1e9 * amount,
+        0,
+        {
+          accounts: {
+            global,
+            feeRecipient,
+            mint,
+            vault,
+            bondingCurve,
+            associatedBondingCurve,
+            associatedUser: associatedUserAccount,
+            user: buyer.publicKey,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            clock: SYSVAR_CLOCK_PUBKEY
+          },
+          signers: [buyer]
+        }
+      );
+      console.log(buy_tx);
+      // });
+      // await program.removeEventListener(listenerId);
+      // console.log(event);
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   // it("sell", async () => {
   //   const [bondingCurve, _1] = await anchor.web3.PublicKey.findProgramAddress(
