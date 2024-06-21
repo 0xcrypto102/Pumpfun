@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint,Token,TokenAccount, Transfer, transfer};
+use anchor_spl::token::{Mint,Token,TokenAccount, Transfer, transfer, SetAuthority};
 use std::mem::size_of;
 use crate::{
     constants::{GLOBAL_STATE_SEED, BONDING_CURVE, VAULT_SEED},
@@ -8,6 +8,8 @@ use crate::{
     events::*,
 };
 use solana_program::{program::invoke, system_instruction};
+use anchor_spl::token;
+use anchor_spl::token::spl_token::instruction::AuthorityType;
 
 #[derive(Accounts)]
 pub struct Create<'info> {
@@ -60,7 +62,6 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     require!(global.initialized == true, ApeLolCode::NotInitialized);
     require!(ctx.accounts.fee_recipient.key() == ctx.accounts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
     require!(mint.supply / 100 * 99 == amount, ApeLolCode::InvalidAmount);
-    require!(mint.supply == 1000000000000000000, ApeLolCode::InvalidSupply);
 
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
@@ -94,6 +95,14 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.complete = false;
     bonding_curve.token_mint = ctx.accounts.mint.key();
 
+    let cpi_accounts = SetAuthority {
+        account_or_mint: ctx.accounts.mint.to_account_info().clone(),
+        current_authority: ctx.accounts.user.to_account_info().clone(),
+    };
+    let cpi_program = ctx.accounts.token_program.to_account_info();
+    let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
+    token::set_authority(cpi_ctx, AuthorityType::MintTokens, None)?;
+ 
     // Log the event details
     msg!(
         "CreateEvent - Mint: {}, BondingCurve: {}, User: {}",
