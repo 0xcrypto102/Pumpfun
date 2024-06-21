@@ -4,23 +4,34 @@
 seeds = false
 skip-lint = false
 
+[programs.localnet]
+apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
+
 [programs.devnet]
-apelol = "7yMaUoFPphgHcur9GxFQcTnefyxCDncwe5dMQG9xp7W7"
+apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
+
 
 [programs.mainnet]
-apelol = "5QXnJabQhP9M4Pi8QAh6MZrGenT9SFpwDaiVFvfYvVv3"
+apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-# cluster = "https://convincing-clean-pallet.solana-mainnet.quiknode.pro/783f9fd9a8ebeb75cdd9b489fd7485a601974b42/"
-cluster = "devnet"
-# cluster = "https://mainnet.helius-rpc.com/?api-key=e2ddfac5-ccdd-4996-974d-af84e401132c"
+# cluster = "Localnet"
+# cluster = "https://api.devnet.solana.com"
+cluster = "https://mainnet.helius-rpc.com/?api-key=e2ddfac5-ccdd-4996-974d-af84e401132c"
+# cluster = "https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926"
+# cluster = "mainnet"
+# cluster = "https://mainnet.helius-rpc.com/?api-key=d973a2d5-0d39-464d-9bc0-ed372343bd53"
+# cluster = "https://red-blissful-cloud.solana-mainnet.quiknode.pro/117d6105b14e6775c5b5401a893b2819fa8c357c/"
 
-wallet = "/root/.config/solana/id.json"
+# wallet = "/root/.config/solana/cupid.json"
+# wallet = "/root/.config/solana/id.json"
 
+wallet = "./keypair.json"
 # wallet = "./keypair.json"
+
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
