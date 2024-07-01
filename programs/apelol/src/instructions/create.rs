@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint,Token,TokenAccount, Transfer, transfer};
 use std::mem::size_of;
 use crate::{
-    constants::{GLOBAL_STATE_SEED, SOL_VAULT_SEED, BONDING_CURVE, VAULT_SEED},
+    constants::{GLOBAL_STATE_SEED, BONDING_CURVE, VAULT_SEED},
     state::{Global, BondingCurve},
     error::*,
     events::*,
@@ -16,6 +16,10 @@ pub struct Create<'info> {
 
     pub mint: Box<Account<'info, Mint>>,
 
+    /// CHECK:` doc comment explaining why no checks through types are necessary.
+    #[account(mut)]
+    pub fee_recipient: AccountInfo<'info>, // wallet address to receive the fee as SOL 
+
     #[account(
         init,
         payer = user,
@@ -24,14 +28,6 @@ pub struct Create<'info> {
         space = 8 + size_of::<BondingCurve>()
     )]
     pub bonding_curve: Box<Account<'info, BondingCurve>>,
-
-    #[account(
-        mut,
-        seeds = [SOL_VAULT_SEED, mint.key().as_ref()],
-        bump
-    )]
-    /// CHECK: this should be set by admin
-    pub vault: UncheckedAccount <'info>,
 
     #[account(
         init_if_needed,
@@ -59,8 +55,14 @@ pub struct Create<'info> {
 pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     let global: &Box<Account<Global>> = &ctx.accounts.global;
     let bonding_curve: &mut Box<Account<BondingCurve>> = &mut ctx.accounts.bonding_curve;
+    let mint = &ctx.accounts.mint;
 
+    require!(ctx.accounts.mint.freeze_authority.is_none(), ApeLolCode::FreezeAuthorityEnabled);
+    require!(ctx.accounts.mint.mint_authority.is_none(), ApeLolCode::MitAuthorityEnabled);
     require!(global.initialized == true, ApeLolCode::NotInitialized);
+    require!(ctx.accounts.fee_recipient.key() == ctx.accounts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
+    require!(mint.supply / 100 * 99 == amount, ApeLolCode::InvalidAmount);
+    require!(mint.supply == 1000000000000000000, ApeLolCode::InvalidSupply);
 
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
@@ -75,12 +77,12 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     invoke(
         &system_instruction::transfer(
             &ctx.accounts.user.key(),
-            &ctx.accounts.vault.key(),
+            &ctx.accounts.fee_recipient.key(),
             global.create_fee
         ),
         &[
             ctx.accounts.user.to_account_info().clone(),
-            ctx.accounts.vault.to_account_info().clone(),
+            ctx.accounts.fee_recipient.to_account_info().clone(),
             ctx.accounts.system_program.to_account_info().clone(),
         ],
     )?;
@@ -89,7 +91,7 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.virtual_sol_reserves = global.initial_virtual_sol_reserves;
     bonding_curve.real_token_reserves = amount;
     bonding_curve.real_sol_reserves = 0;
-    bonding_curve.token_total_supply = global.token_total_supply;
+    bonding_curve.token_total_supply = mint.supply;
     bonding_curve.mcap_limit = global.mcap_limit;
     bonding_curve.complete = false;
     bonding_curve.token_mint = ctx.accounts.mint.key();

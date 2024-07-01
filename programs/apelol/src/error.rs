@@ -14,9 +14,6 @@ pub enum ApeLolCode {
     #[msg("slippage: Too much SOL required to buy the given amount of tokens.")]
     TooMuchSolRequired,
 
-    #[msg("slippage: Too little Token received to sell the given amount of SOL.")]
-    TooLittleTokenReceived,
-
     #[msg("slippage: Too little SOL received to sell the given amount of tokens.")]
     TooLittleSolReceived,
 
@@ -35,6 +32,21 @@ pub enum ApeLolCode {
     #[msg("Math operation overflow.")]
     MathOverflow,
 
+    #[msg("Buy Amount Over.")]
+    BuyAmountOver
+
     #[msg("Amount should be bigger than 0.")]
-    ZeroAmount
+    ZeroAmount,
+
+    #[msg("Amount is invalid to create the pool.")]
+    InvalidAmount,
+
+    #[msg("Supply is invalid to create the pool.")]
+    InvalidSupply,
+
+    #[msg("Freeze authority enabled.")]
+    FreezeAuthorityEnabled,
+
+    #[msg("Mint authority enabled.")]
+    MitAuthorityEnabled,
 }
