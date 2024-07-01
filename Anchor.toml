@@ -6,11 +6,11 @@ skip-lint = false
 
 
 [programs.devnet]
-apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
+apelol = "4KYtF9oR8MLRW7MBTXfVaL3xirR9fLdCoXKkExSVEjkQ"
 
 
 [programs.mainnet]
-apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
+apelol = "4P183m7e48eAUvC2tJAtgvZ99cqKuYFmX5GYJAqMwYmN"
 
 [registry]
 url = "https://api.apr.dev"
@@ -24,9 +24,9 @@ cluster = "https://api.devnet.solana.com"
 # cluster = "https://red-blissful-cloud.solana-mainnet.quiknode.pro/117d6105b14e6775c5b5401a893b2819fa8c357c/"
 
 # wallet = "/root/.config/solana/cupid.json"
-# wallet = "/root/.config/solana/id.json"
+wallet = "/root/.config/solana/id.json"
 
-wallet = "./keypair.json"
+# wallet = "./keypair.json"
 # wallet = "./keypair.json"
 
 
