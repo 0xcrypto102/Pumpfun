@@ -8,8 +8,7 @@ skip-lint = false
 apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
 
 [programs.devnet]
-apelol = "DHAiQ51vZXYGXdTpRcMKzBozEASE4iiGgRN3X6dU2LHR"
-
+apelol = "FEa515UTjvi2kt3VtfFoCU3MmB5J93CAaaJPeirH1hc1"
 
 [programs.mainnet]
 apelol = "DHAiQ51vZXYGXdTpRcMKzBozEASE4iiGgRN3X6dU2LHR"

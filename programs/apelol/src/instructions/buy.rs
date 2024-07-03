@@ -60,29 +60,35 @@ pub struct Buy<'info> {
     pub clock:  Sysvar<'info, Clock>,
 }
 
-pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
+pub fn buy(ctx: Context<Buy>, token_amount: u64, max_sol_cost: u64) -> Result<()> {
     let accts = ctx.accounts;
-
+    let mut amount = token_amount;
+    
     require!(amount >0 , ApeLolCode::ZeroAmount);
     require!(accts.bonding_curve.complete == false, ApeLolCode::BondingCurveComplete);
     require!(accts.fee_recipient.key() == accts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
 
     let feature_amount = accts.bonding_curve.real_token_reserves - amount;
     let feature_percentage = ((feature_amount as u128) * (100 as u128) / (accts.bonding_curve.token_total_supply as u128)) as u64;
-    require!(feature_percentage <= 20, ApeLolCode::BuyAmountOver);
+
+    if feature_percentage <=20 {
+        amount = accts.bonding_curve.real_token_reserves - accts.bonding_curve.token_total_supply *2 /10;
+    }
+    // require!(feature_percentage >= 20, ApeLolCode::BuyAmountOver);
 
     let bonding_curve = &accts.bonding_curve;
     let global = &accts.global;
 
     // Calculate the required SOL cost for the given token amount
     let sol_cost = calculate_sol_cost(bonding_curve,global, amount)?;
+    msg!("sol_cost:{}",sol_cost);
 
     // Ensure the SOL cost does not exceed max_sol_cost
     require!(sol_cost <= max_sol_cost, ApeLolCode::TooMuchSolRequired);
 
     // send sol except fee to the bonding curve
     let fee_amount = accts.global.fee_basis_points * sol_cost / 10000;
-    let sol_amount = sol_cost - fee_amount;
+    let sol_amount = sol_cost;
 
     invoke(
         &system_instruction::transfer(
@@ -133,18 +139,14 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     //  update the bonding curve
     accts.bonding_curve.real_token_reserves -= amount;
     accts.bonding_curve.virtual_token_reserves -= amount;
-    accts.bonding_curve.virtual_sol_reserves += sol_cost - fee_amount;
-    accts.bonding_curve.real_sol_reserves += sol_cost - fee_amount;
+    accts.bonding_curve.virtual_sol_reserves += sol_cost;
+    accts.bonding_curve.real_sol_reserves += sol_cost;
 
     let macp = ((accts.bonding_curve.virtual_sol_reserves as u128) * (accts.bonding_curve.token_total_supply as u128) / (accts.bonding_curve.real_token_reserves as u128)) as u64;
-    msg!("macp:{}",macp);
     let percentage = ((accts.bonding_curve.real_token_reserves as u128) * (100 as u128) / (accts.bonding_curve.token_total_supply as u128)) as u64;
-    msg!("percentage:{}",percentage);
 
-    if macp > accts.bonding_curve.mcap_limit || percentage < 20 {
-
+    if macp > accts.bonding_curve.mcap_limit || percentage <= 20 {
         accts.bonding_curve.complete = true;
-
         msg!(
             "Bonding Curve Complete : User: {}, Mint: {}, BondingCurve: {}, Timestamp: {}",
             accts.user.key(),
@@ -203,17 +205,16 @@ fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, global: &Account<Gl
 
     let temp_new_sol_reserve = temp_total_liquidity.checked_div(temp_price_per_token).ok_or(ApeLolCode::MathOverflow)?;
 
-    let temp_sol_cost = temp_new_sol_reserve.checked_sub(bonding_curve.virtual_sol_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
-
+    let temp_sol_cost = temp_new_sol_reserve.checked_sub(global.initial_virtual_sol_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
 
     let virtual_token_reserves = bonding_curve.virtual_token_reserves - sold_amount;
     let price_per_token  = (virtual_token_reserves as u128).checked_sub(token_amount as u128).ok_or(ApeLolCode::MathOverflow)?;
 
-    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128 + temp_sol_cost as u128).checked_mul(bonding_curve.virtual_token_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
+    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128 + temp_sol_cost as u128).checked_mul(virtual_token_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
 
     let new_sol_reserve = total_liquidity.checked_div(price_per_token).ok_or(ApeLolCode::MathOverflow)?;
 
-    let sol_cost = new_sol_reserve.checked_sub(bonding_curve.virtual_sol_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
+    let sol_cost = new_sol_reserve.checked_sub(bonding_curve.virtual_sol_reserves as u128 + temp_sol_cost as u128).ok_or(ApeLolCode::MathOverflow)?;
 
     Ok(sol_cost as u64)
 }

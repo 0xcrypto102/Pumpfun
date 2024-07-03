@@ -69,9 +69,12 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
 
     // Calculate the required SOL cost for the given token amount
     let mut sol_cost = calculate_sol_cost(bonding_curve, amount)?;
+    msg!("sol_cost:{}",sol_cost);
+
     if accts.bonding_curve.real_sol_reserves < sol_cost {
         sol_cost = accts.bonding_curve.real_sol_reserves;
     }
+    msg!("sol_cost:{}",sol_cost);
 
     // Ensure the SOL cost does not exceed max_sol_cost
     require!(sol_cost >= min_sol_output, ApeLolCode::TooLittleSolReceived);

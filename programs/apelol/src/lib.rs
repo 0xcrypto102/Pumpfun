@@ -11,7 +11,7 @@ use instructions::*;
 pub use state::*;
 pub use events::*;
 
-declare_id!("DHAiQ51vZXYGXdTpRcMKzBozEASE4iiGgRN3X6dU2LHR");
+declare_id!("FEa515UTjvi2kt3VtfFoCU3MmB5J93CAaaJPeirH1hc1");
 
 #[program]
 pub mod apelol {
@@ -51,8 +51,8 @@ pub mod apelol {
         instructions::create(ctx, amount)
     }
 
-    pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
-        instructions::buy(ctx, amount, max_sol_cost)
+    pub fn buy(ctx: Context<Buy>, token_amount: u64, max_sol_cost: u64) -> Result<()> {
+        instructions::buy(ctx, token_amount, max_sol_cost)
     }
 
     pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> {
