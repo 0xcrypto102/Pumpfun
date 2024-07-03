@@ -79,7 +79,7 @@ describe("Apelol", () => {
   type Event = anchor.IdlEvents<(typeof program)["idl"]>;
   console.log(user.publicKey.toString());
 
-  it.only("GET PDA", async () => {
+  it("GET PDA", async () => {
     [global, globalBump] = await anchor.web3.PublicKey.findProgramAddress(
       [Buffer.from("GLOBAL-STATE-SEED")],
       program.programId
@@ -87,7 +87,7 @@ describe("Apelol", () => {
     console.log("global->", global.toString());
   });
 
-  it.only("Is initialized!", async () => {
+  it("Is initialized!", async () => {
     try {
       const tx = await program.rpc.initialize({
         accounts: {
@@ -103,7 +103,7 @@ describe("Apelol", () => {
     }
   });
 
-  it.only("set params", async () => {
+  it("set params", async () => {
     const initialVirtualTokenReserves = "1073000000000000000";
     const initialVirtualSolReserves = "30000000000";
     const initialRealTokenReserves = "793100000000000000";
@@ -427,6 +427,7 @@ describe("Apelol", () => {
 
 const exchangeRate = (purchaseAmount: number, liquidityPool: any) => {
   let tokensSold = new anchor.BN(0);
+  const virtualTokenReserves = liquidityPool.virtualTokenReserves * 8 / 10;
   const totalLiquidity = liquidityPool.virtualSolReserves.mul(
     liquidityPool.virtualTokenReserves
   );

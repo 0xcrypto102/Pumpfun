@@ -33,7 +33,7 @@ pub enum ApeLolCode {
     MathOverflow,
 
     #[msg("Buy Amount Over.")]
-    BuyAmountOver
+    BuyAmountOver,
 
     #[msg("Amount should be bigger than 0.")]
     ZeroAmount,

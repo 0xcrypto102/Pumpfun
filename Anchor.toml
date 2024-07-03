@@ -8,11 +8,11 @@ skip-lint = false
 apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
 
 [programs.devnet]
-apelol = "GZk9Wmkq5HDFBihtJmN1pSxq2WcPRLvBdd2no1xmF1nt"
+apelol = "DHAiQ51vZXYGXdTpRcMKzBozEASE4iiGgRN3X6dU2LHR"
 
 
 [programs.mainnet]
-apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
+apelol = "DHAiQ51vZXYGXdTpRcMKzBozEASE4iiGgRN3X6dU2LHR"
 
 [registry]
 url = "https://api.apr.dev"

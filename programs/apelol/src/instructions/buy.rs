@@ -69,12 +69,13 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
 
     let feature_amount = accts.bonding_curve.real_token_reserves - amount;
     let feature_percentage = ((feature_amount as u128) * (100 as u128) / (accts.bonding_curve.token_total_supply as u128)) as u64;
-    require!(feature_percentage > 20, ApeLolCode::BuyAmountOver);
+    require!(feature_percentage <= 20, ApeLolCode::BuyAmountOver);
 
     let bonding_curve = &accts.bonding_curve;
+    let global = &accts.global;
 
     // Calculate the required SOL cost for the given token amount
-    let sol_cost = calculate_sol_cost(bonding_curve, amount)?;
+    let sol_cost = calculate_sol_cost(bonding_curve,global, amount)?;
 
     // Ensure the SOL cost does not exceed max_sol_cost
     require!(sol_cost <= max_sol_cost, ApeLolCode::TooMuchSolRequired);
@@ -191,12 +192,24 @@ pub fn buy(ctx: Context<Buy>, amount: u64, max_sol_cost: u64) -> Result<()> {
     Ok(())
 }
 
-fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, token_amount: u64) -> Result<u64> {
-    let virtual_token_reserves = bonding_curve.virtual_token_reserves * 8 / 10;
+fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, global: &Account<Global>, token_amount: u64) -> Result<u64> {
+    let sold_amount = bonding_curve.token_total_supply / 5;
 
+    let temp_virtual_token_reserves = global.initial_virtual_token_reserves;
+
+    let temp_price_per_token  = (temp_virtual_token_reserves as u128).checked_sub(sold_amount as u128).ok_or(ApeLolCode::MathOverflow)?;
+
+    let temp_total_liquidity = (global.initial_virtual_token_reserves as u128).checked_mul(global.initial_virtual_sol_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
+
+    let temp_new_sol_reserve = temp_total_liquidity.checked_div(temp_price_per_token).ok_or(ApeLolCode::MathOverflow)?;
+
+    let temp_sol_cost = temp_new_sol_reserve.checked_sub(bonding_curve.virtual_sol_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
+
+
+    let virtual_token_reserves = bonding_curve.virtual_token_reserves - sold_amount;
     let price_per_token  = (virtual_token_reserves as u128).checked_sub(token_amount as u128).ok_or(ApeLolCode::MathOverflow)?;
 
-    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128).checked_mul(bonding_curve.virtual_token_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
+    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128 + temp_sol_cost as u128).checked_mul(bonding_curve.virtual_token_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
 
     let new_sol_reserve = total_liquidity.checked_div(price_per_token).ok_or(ApeLolCode::MathOverflow)?;
 
