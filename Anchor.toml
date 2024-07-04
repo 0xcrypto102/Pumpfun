@@ -4,21 +4,23 @@
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-apelol = "C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z"
 
 [programs.devnet]
-apelol = "FEa515UTjvi2kt3VtfFoCU3MmB5J93CAaaJPeirH1hc1"
+apelol = "sAgQhdtEhUBvefvb6KYjP64aGWiaRVrgAWidZ7SFrSb"
+
 
 [programs.mainnet]
-apelol = "DHAiQ51vZXYGXdTpRcMKzBozEASE4iiGgRN3X6dU2LHR"
+apelol = "sAgQhdtEhUBvefvb6KYjP64aGWiaRVrgAWidZ7SFrSb"
+
+[programs.localnet] 
+apelol = "sAgQhdtEhUBvefvb6KYjP64aGWiaRVrgAWidZ7SFrSb"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-# cluster = "Localnet"
-cluster = "https://api.devnet.solana.com"
+cluster = "Localnet"
+# cluster = "https://api.devnet.solana.com"
 # cluster = "https://mainnet.helius-rpc.com/?api-key=e2ddfac5-ccdd-4996-974d-af84e401132c"
 # cluster = "https://hidden-patient-slug.solana-mainnet.quiknode.pro/d8cb6d9a7b156d44efaca020f46f9196d20bc926"
 # cluster = "mainnet"
@@ -26,10 +28,10 @@ cluster = "https://api.devnet.solana.com"
 # cluster = "https://red-blissful-cloud.solana-mainnet.quiknode.pro/117d6105b14e6775c5b5401a893b2819fa8c357c/"
 
 # wallet = "/root/.config/solana/cupid.json"
-wallet = "/root/.config/solana/id.json"
+# wallet = "/root/.config/solana/id.json"
 
-# wallet = "./keypair.json"
-# wallet = "./keypair.json"
+wallet = "./keypair.json"
+# wallet = "./keypair.production.json"
 
 
 [scripts]

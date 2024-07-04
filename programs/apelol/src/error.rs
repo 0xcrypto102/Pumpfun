@@ -32,9 +32,6 @@ pub enum ApeLolCode {
     #[msg("Math operation overflow.")]
     MathOverflow,
 
-    #[msg("Buy Amount Over.")]
-    BuyAmountOver,
-
     #[msg("Amount should be bigger than 0.")]
     ZeroAmount,
 

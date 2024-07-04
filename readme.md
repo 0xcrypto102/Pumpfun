@@ -24,7 +24,7 @@
 # Build
 
 - anchor build
-- Find address `solana address -k target/deploy/pumpfun-keypair.json`
+- Find address `solana address -k target/deploy/apelol-keypair.json`
 - Change contract
 - anchor build
 - deploy
@@ -48,6 +48,21 @@ solana program close --buffers --keypair ./keypair.json
 
 # Contracts
 
+- Devnet - `6DeKw29N78pNy1P45tGir6nXS9pbBnZMCxyM6ndUXDSo`
 - Staging - `sAgQhdtEhUBvefvb6KYjP64aGWiaRVrgAWidZ7SFrSb`
-- Devnet - `6DeKw29N78pNy1P45tGir6nXS9pbBnZMCxyM6ndUXDSoz`
 - Mainnet - `C5aDJcpAswU8hzBNEwkj8kcxtcWJdBrQpxyFk1gMPg8z`
+
+# Upgrading Contracts
+
+- Build
+- Copy keypair of ENV
+- Build & Change Anchor.toml and lib.rs
+- Deploy
+
+# Allocate more Bytes
+
+`solana program extend sAgQhdtEhUBvefvb6KYjP64aGWiaRVrgAWidZ7SFrSb 640000 --keypair ./keypair.json`
+
+# IDL Upload
+
+`anchor idl init --filepath ./target/idl/apelol.json sAgQhdtEhUBvefvb6KYjP64aGWiaRVrgAWidZ7SFrSb --provider.cluster <CLUSTER> --provider.wallet <WALLET>`

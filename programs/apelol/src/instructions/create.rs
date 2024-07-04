@@ -57,8 +57,8 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     let bonding_curve: &mut Box<Account<BondingCurve>> = &mut ctx.accounts.bonding_curve;
     let mint = &ctx.accounts.mint;
 
-    require!(ctx.accounts.mint.freeze_authority.is_none(), ApeLolCode::FreezeAuthorityEnabled);
-    require!(ctx.accounts.mint.mint_authority.is_none(), ApeLolCode::MitAuthorityEnabled);
+    // require!(ctx.accounts.mint.freeze_authority.is_none(), ApeLolCode::FreezeAuthorityEnabled);
+    // require!(ctx.accounts.mint.mint_authority.is_none(), ApeLolCode::MitAuthorityEnabled);
     require!(global.initialized == true, ApeLolCode::NotInitialized);
     require!(ctx.accounts.fee_recipient.key() == ctx.accounts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
     require!(mint.supply / 100 * 99 == amount, ApeLolCode::InvalidAmount);
