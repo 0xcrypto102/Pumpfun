@@ -57,12 +57,12 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     let bonding_curve: &mut Box<Account<BondingCurve>> = &mut ctx.accounts.bonding_curve;
     let mint = &ctx.accounts.mint;
 
-    require!(ctx.accounts.mint.freeze_authority.is_none(), ApeLolCode::FreezeAuthorityEnabled);
-    require!(ctx.accounts.mint.mint_authority.is_none(), ApeLolCode::MitAuthorityEnabled);
+    // require!(ctx.accounts.mint.freeze_authority.is_none(), ApeLolCode::FreezeAuthorityEnabled);
+    // require!(ctx.accounts.mint.mint_authority.is_none(), ApeLolCode::MitAuthorityEnabled);
     require!(global.initialized == true, ApeLolCode::NotInitialized);
     require!(ctx.accounts.fee_recipient.key() == ctx.accounts.global.fee_recipient, ApeLolCode::UnValidFeeRecipient);
-    require!(mint.supply / 100 * 99 == amount, ApeLolCode::InvalidAmount);
-    require!(mint.supply == 1000000000000000000, ApeLolCode::InvalidSupply);
+    // require!(mint.supply / 100 * 99 == amount, ApeLolCode::InvalidAmount);
+    // require!(mint.supply == 1000000000000000000, ApeLolCode::InvalidSupply);
 
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
@@ -91,7 +91,9 @@ pub fn create(ctx: Context<Create>, amount: u64) -> Result<()> {
     bonding_curve.virtual_sol_reserves = global.initial_virtual_sol_reserves;
     bonding_curve.real_token_reserves = amount;
     bonding_curve.real_sol_reserves = 0;
-    bonding_curve.token_total_supply = mint.supply;
+    // bonding_curve.token_total_supply = mint.supply;
+    bonding_curve.token_total_supply = global.token_total_supply;
+
     bonding_curve.mcap_limit = global.mcap_limit;
     bonding_curve.complete = false;
     bonding_curve.token_mint = ctx.accounts.mint.key();

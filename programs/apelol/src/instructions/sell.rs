@@ -66,9 +66,10 @@ pub fn sell(ctx: Context<Sell>, amount: u64, min_sol_output: u64) -> Result<()> 
     require!(amount >0 , ApeLolCode::ZeroAmount);
 
     let bonding_curve = &accts.bonding_curve;
+    let global = &accts.global;
 
     // Calculate the required SOL cost for the given token amount
-    let mut sol_cost = calculate_sol_cost(bonding_curve, amount)?;
+    let mut sol_cost = calculate_sol_cost(bonding_curve, global,amount)?;
     msg!("sol_cost:{}",sol_cost);
 
     if accts.bonding_curve.real_sol_reserves < sol_cost {
@@ -163,14 +164,54 @@ fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, token_amount: u64) 
 }
 */
 
-fn calculate_sol_cost(bonding_curve: &Account<BondingCurve>, token_amount: u64) -> Result<u64> {
-    let price_per_token  = (bonding_curve.virtual_token_reserves as u128).checked_add(token_amount as u128).ok_or(ApeLolCode::MathOverflow)?;
+fn calculate_sol_cost(
+    bonding_curve: &Account<BondingCurve>,
+    global: &Account<Global>,
+    token_amount: u64
+) -> Result<u64> {
+    let sold_amount = bonding_curve.token_total_supply / 5;
 
-    let total_liquidity = (bonding_curve.virtual_sol_reserves as u128).checked_mul(bonding_curve.virtual_token_reserves as u128).ok_or(ApeLolCode::MathOverflow)?;
+    let initial_virtual_token_reserves = global.initial_virtual_token_reserves;
 
-    let new_sol_reserve = total_liquidity.checked_div(price_per_token).ok_or(ApeLolCode::MathOverflow)?;
+    let initial_price_per_token = (initial_virtual_token_reserves as u128)
+        .checked_sub(sold_amount as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
 
-    let sol_cost = ((bonding_curve.virtual_sol_reserves as u128).checked_sub(new_sol_reserve).ok_or(ApeLolCode::MathOverflow)?) as u64;
+    let total_liquidity = (global.initial_virtual_token_reserves as u128)
+        .checked_mul(global.initial_virtual_sol_reserves as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
 
-    Ok(sol_cost as u64)
+    let new_sol_reserve = total_liquidity
+        .checked_div(initial_price_per_token)
+        .ok_or(ApeLolCode::MathOverflow)?;
+
+    let sol_cost = new_sol_reserve
+        .checked_sub(global.initial_virtual_sol_reserves as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
+
+    let price_per_token = (bonding_curve.virtual_token_reserves as u128)
+        .checked_sub(sold_amount as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
+    
+    let temp_price_per_token = price_per_token
+        .checked_add(token_amount as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
+
+    let virtual_sol_reserves = (bonding_curve.virtual_sol_reserves as u128)
+        .checked_add(sol_cost as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
+
+    let updated_liquidity = virtual_sol_reserves
+        .checked_mul(price_per_token as u128)
+        .ok_or(ApeLolCode::MathOverflow)?;
+
+    let final_sol_reserve = updated_liquidity
+        .checked_div(temp_price_per_token)
+        .ok_or(ApeLolCode::MathOverflow)?;
+
+    let final_sol_cost = ((virtual_sol_reserves as u128)
+        .checked_sub(final_sol_reserve)
+        .ok_or(ApeLolCode::MathOverflow)?) as u64;
+
+    Ok(final_sol_cost as u64)
 }

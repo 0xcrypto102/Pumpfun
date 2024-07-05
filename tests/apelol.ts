@@ -86,7 +86,7 @@ describe("Apelol", () => {
     );
     console.log("global->", global.toString());
   });
-
+  /*
   it("Is initialized!", async () => {
     try {
       const tx = await program.rpc.initialize({
@@ -223,7 +223,7 @@ describe("Apelol", () => {
 
 
     const slippage = 20;
-    const amount = 1;
+    const amount = 0.1;
     const tokenReceivedWithLiquidity = exchangeRate(
       Math.floor(1e9 * amount),
       globalPool,
@@ -271,6 +271,7 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
+  */
   
   it("sell", async () => {
     const associatedUserAccount = await getAssociatedTokenAddress(
@@ -305,12 +306,12 @@ describe("Apelol", () => {
       bondingCurve
     );
     const slippage = 20;
-    const amount = "23050812086017538"
+    const amount = "2361191921257472"
 
-    const solAmount = exchangeSellRate(new anchor.BN(amount), liquidityPool);
+    const solAmount = exchangeSellRate(new anchor.BN(amount), globalStateData,liquidityPool);
     console.log("sol amount ->", solAmount);
     const minSolAmount = solAmount * (100 - slippage) / 100;
-    console.log("sol amount ->", minSolAmount);
+    console.log("min sol amount ->", minSolAmount);
 
     try {
     //   let listenerId: number;
@@ -346,6 +347,7 @@ describe("Apelol", () => {
       console.log(error);
     }
   });
+  
 
   /*
   it("withdraw the bonding curve", async () => {
@@ -496,20 +498,46 @@ const exchangeRate = (
 };
 
 
-const exchangeSellRate = (amount: anchor.BN, liquidityPool: any) => {
-  const token_amount = Number(amount);
-  console.log("token_amount->", token_amount);
-  const price_per_token  = Number(liquidityPool.virtualTokenReserves) + token_amount;
-  console.log("price_per_token->", price_per_token);
+const exchangeSellRate = (amount: anchor.BN, globalPool: any,liquidityPool: any) => {
+  let tokensSold = 0;
+  let soldAmount = liquidityPool.tokenTotalSupply / 5;
 
-  const total_liquidity = Number(liquidityPool.virtualSolReserves) * Number(liquidityPool.virtualTokenReserves);
-  console.log("total_liquidity->", total_liquidity);
+  console.log(globalPool);
+  // Ensure that globalPool.initialVirtualTokenReserves is defined and is a BN instance
+  if (!globalPool.initialVirtualTokenReserves || !anchor.BN.isBN(globalPool.initialVirtualTokenReserves)) {
+    throw new Error('globalPool.initialVirtualTokenReserves is not defined or not a BN instance');
+  }
+
+  let tempVirtualTokenReserves = globalPool.initialVirtualTokenReserves;
+  let tempPricePerToken = Number(tempVirtualTokenReserves) - soldAmount;
+
+  // Ensure that globalPool.initialVirtualSolReserves is defined and is a BN instance
+  if (!globalPool.initialVirtualSolReserves || !anchor.BN.isBN(globalPool.initialVirtualSolReserves)) {
+    throw new Error('globalPool.initialVirtualSolReserves is not defined or not a BN instance');
+  }
+
+  let tempTotalLiquidity = globalPool.initialVirtualTokenReserves.mul(
+    globalPool.initialVirtualSolReserves
+  );
+
+  // Ensure globalPool.virtualSolReserves is defined and is a BN instance
+  if (!globalPool.initialVirtualSolReserves || !anchor.BN.isBN(globalPool.initialVirtualSolReserves)) {
+    throw new Error('globalPool.virtualSolReserves is not defined or not a BN instance');
+  }
+
+  let tempNewSolReserve = Number(tempTotalLiquidity)/(tempPricePerToken);
+
+  let temp_sol_cost = tempNewSolReserve - Number(globalPool.initialVirtualSolReserves);
+
+
+  const token_amount = Number(amount);
+  const price_per_token  = Number(liquidityPool.virtualTokenReserves) + token_amount - soldAmount;
+
+  const total_liquidity = (Number(liquidityPool.virtualSolReserves) + temp_sol_cost) * (Number(liquidityPool.virtualTokenReserves) - soldAmount);
 
   const new_sol_reserve = total_liquidity / Number(price_per_token);
-  console.log("new_sol_reserve->", new_sol_reserve);
 
-  const sol_cost = Number(liquidityPool.virtualSolReserves) - new_sol_reserve;
-  console.log("sol_cost->", sol_cost);
+  const sol_cost = Number(liquidityPool.virtualSolReserves) + temp_sol_cost - new_sol_reserve;
 
   return sol_cost;
 };
